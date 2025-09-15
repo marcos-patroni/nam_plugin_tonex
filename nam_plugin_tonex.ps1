@@ -1,3 +1,29 @@
+function Limit-StringTo64Bytes {
+    param (
+        [string]$myinput
+    )
+
+    $utf8 = [System.Text.Encoding]::UTF8
+    $bytes = $utf8.GetBytes($myinput)
+
+    if ($bytes.Length -le 64) {
+        return $myinput
+    }
+
+    # Trim byte array to 64 bytes
+    $trimmedBytes = $bytes[0..63]
+
+    # Decode back to string (may cut off multibyte characters)
+    $myoutput = $utf8.GetString($trimmedBytes)
+
+    # Optional: remove incomplete characters at the end
+    while ($utf8.GetByteCount($myoutput) -gt 64) {
+        $myoutput = $myoutput.Substring(0, $myoutput.Length - 1)
+    }
+
+    return $myoutput
+}
+
 # Get the directory where the script is located
 $scriptDirectory = $PSScriptRoot
 
@@ -28,7 +54,7 @@ foreach ($wavFile in $wavFiles) {
 
         # Create a timestamped directory name
 	    $originalBN = $wavFile.BaseName
-        $originalBaseName = Limit-StringTo64Bytes -input $originalBN
+        $originalBaseName = Limit-StringTo64Bytes -myinput $originalBN
 
         $timestamp = Get-Date -Format "yyMMddTHHmmss"
   	    $directoryName = "${timestamp} ${originalBaseName}"
@@ -97,30 +123,4 @@ foreach ($wavFile in $wavFiles) {
 Write-Host "Script finished."
 
 
-
-function Limit-StringTo64Bytes {
-    param (
-        [string]$input
-    )
-
-    $utf8 = [System.Text.Encoding]::UTF8
-    $bytes = $utf8.GetBytes($input)
-
-    if ($bytes.Length -le 64) {
-        return $input
-    }
-
-    # Trim byte array to 64 bytes
-    $trimmedBytes = $bytes[0..63]
-
-    # Decode back to string (may cut off multibyte characters)
-    $output = $utf8.GetString($trimmedBytes)
-
-    # Optional: remove incomplete characters at the end
-    while ($utf8.GetByteCount($output) -gt 64) {
-        $output = $output.Substring(0, $output.Length - 1)
-    }
-
-    return $output
-}
 
