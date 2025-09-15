@@ -21,13 +21,15 @@ Set-Variable -Name otherValue -Value "OTHER" -Option Constant
 foreach ($wavFile in $wavFiles) {
     # Check if the file size is 31133800 30228584 bytes
     Write-Host "$($wavFile.Length)"
-    if ($wavFile.Length -eq 30228584 -or $wavFile.Length -eq 31133800) {
+    if (($wavFile.Length -ge 30227584 -and $wavFile.Length -le 30229584) -or ($wavFile.Length -ge 31132800 -and $wavFile.Length -le 31134800)) {
         #Define instrument
-        $instrument = if ($wavFile.Length -eq 30228584) { "0" } else { "1" }
+        $instrument = if ($wavFile.Length -lt 31132800) { "0" } else { "1" }
 
 
         # Create a timestamped directory name
-	    $originalBaseName = $wavFile.BaseName
+	    $originalBN = $wavFile.BaseName
+        $originalBaseName = Limit-StringTo64Bytes -input $originalBN
+
         $timestamp = Get-Date -Format "yyMMddTHHmmss"
   	    $directoryName = "${timestamp} ${originalBaseName}"
         $newDirectoryPath = Join-Path -Path $documentsPath -ChildPath $directoryName
@@ -93,3 +95,32 @@ foreach ($wavFile in $wavFiles) {
 }
 
 Write-Host "Script finished."
+
+
+
+function Limit-StringTo64Bytes {
+    param (
+        [string]$input
+    )
+
+    $utf8 = [System.Text.Encoding]::UTF8
+    $bytes = $utf8.GetBytes($input)
+
+    if ($bytes.Length -le 64) {
+        return $input
+    }
+
+    # Trim byte array to 64 bytes
+    $trimmedBytes = $bytes[0..63]
+
+    # Decode back to string (may cut off multibyte characters)
+    $output = $utf8.GetString($trimmedBytes)
+
+    # Optional: remove incomplete characters at the end
+    while ($utf8.GetByteCount($output) -gt 64) {
+        $output = $output.Substring(0, $output.Length - 1)
+    }
+
+    return $output
+}
+
