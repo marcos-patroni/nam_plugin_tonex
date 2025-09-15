@@ -1,3 +1,19 @@
+To "enable PowerShell" often refers to allowing PowerShell scripts to run on your system, as by default, 
+the execution policy might be set to restrict script execution.
+Here's how to enable script execution in PowerShell: 
+Open PowerShell as Administrator:
+Search for "PowerShell" in the Start Menu.
+Right-click on "Windows PowerShell" and select "Run as administrator."
+Set-ExecutionPolicy Unrestricted
+Set-ExecutionPolicy RemoteSigned
+Set-ExecutionPolicy Restricted
+
+Download wav from 
+https://github.com/marcos-patroni/nam_plugin_tonex/raw/refs/heads/main/GuitarAudio.wav
+https://github.com/marcos-patroni/nam_plugin_tonex/raw/refs/heads/main/BassAudio.wav
+R
+
+
 C:\Users\marcos\Documents\IK Multimedia\TONEX\Modeler
 
 {
@@ -64,6 +80,11 @@ C:\Users\marcos\Documents\IK Multimedia\TONEX\Modeler
   "Outboard": "",
   "CabModelComment": ""
 }
+
+
+
+
+
 
 $FilePath = "C:\media\git\nam_plugin_tonex\GuitarAudio.wav"
 $hash = Get-FileHash -Path $FilePath -Algorithm SHA1
